@@ -15,6 +15,8 @@ import com.andre.crud_spring_back.repository.CourseRepository;
 import lombok.AllArgsConstructor;
 
 import java.util.List;
+import org.springframework.web.bind.annotation.PutMapping;
+
 
 
 @RestController
@@ -39,5 +41,18 @@ public class CourseController {
     @PostMapping
     public ResponseEntity<Course> create(@RequestBody Course course) {
         return ResponseEntity.status(HttpStatus.CREATED).body(courseRepository.save(course));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Course> update(@PathVariable Long id, @RequestBody Course course) {
+        return courseRepository.findById(id)
+            .map(courseFound -> {
+                courseFound.setName(course.getName());
+                courseFound.setCategory(course.getCategory());
+                Course updated = courseRepository.save(courseFound);
+                
+                return ResponseEntity.ok().body(updated);
+            })
+            .orElse(ResponseEntity.notFound().build());
     }
 }
